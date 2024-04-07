@@ -7,7 +7,7 @@
             <Plus/>
           </el-icon>
         </template>
-        新增标签
+        新增分类
       </el-button>
       <el-button type="danger" :disabled="selectCategory.length == 0" @click="doDeleteCategoryBatch">
         <template #icon>
@@ -18,7 +18,7 @@
         批量删除
       </el-button>
       <div class="search">
-        <el-input v-model="categoryName" style="margin-right: 10px">
+        <el-input v-model="categoryName" style="margin-right: 10px" @keydown.enter="searchCategory">
           <template #prefix>
             <el-icon>
               <Search/>
@@ -61,7 +61,7 @@
               cancel-button-text="取消"
               width="220"
               icon-color="#626AEF"
-              title="确定要删除该标签吗?"
+              title="确定要删除该分类吗?"
               @confirm="doDeleteCategory(scope.row)"
           >
             <template #reference>
@@ -86,14 +86,20 @@
     />
   </div>
   <!-- 添加编辑对话框 -->
-  <el-dialog v-model="addOrEdit" :width="getBodyWidth >= 667 ? '30%' : '90%'">
+  <el-dialog v-model="addOrEdit">
     <template #header>
       <div style="font-size: 17px">
         {{ categoryForm.id != null ? '编辑分类' : '新增分类' }}
       </div>
     </template>
-    <el-form label-width="80px" size="medium" :model="categoryForm">
-      <el-form-item label="分类名">
+    <el-form label-width="80px" ref="formRef" :model="categoryForm" @submit.native.prevent>
+      <el-form-item prop="categoryName" label="分类名"  :rules="[
+        {
+          required: true,
+          message: '分类名不能为空',
+          trigger: 'blur',
+        },
+      ]"  >
         <el-input v-model="categoryForm.categoryName"  />
       </el-form-item>
     </el-form>
@@ -121,6 +127,7 @@ export default {
     let categoryList = ref([])
     let selectCategory = ref([])
     let addOrEdit = ref(false) //编辑或者新增对话框
+    let formRef = ref()
     let categoryForm = reactive({
       id:null,
       categoryName:'',
@@ -131,7 +138,7 @@ export default {
     }
     let state = reactive({
       count:0,
-      bodyWidth:0
+
     })
     //批量删除
     const doDeleteCategoryBatch = () => {
@@ -178,10 +185,6 @@ export default {
         }
       })
     }
-    const getBodyWidth = computed(() => {
-      state.bodyWidth = store.state.bodyWidth
-      return state.bodyWidth
-    })
     //打开对话框
     const openDialog = (data) => {
       categoryForm.id = null
@@ -194,25 +197,29 @@ export default {
     }
     //新增或者编辑分类
     const addOrEditCategory = () => {
-      let data = {}
-      if (categoryForm.id == null){
-        data.categoryName = categoryForm.categoryName
-      }else {
-        data.id = categoryForm.id
-        data.categoryName = categoryForm.categoryName
-      }
-      addOrUpdateCategory(data).then(res=>{
-        if (res.flag){
-          ElMessage({
-            type:"success",
-            message:"操作成功"
-          })
-          addOrEdit.value = !addOrEdit.value
-          getCategories()
-        }else {
-          ElMessage({
-            type:"error",
-            message:"操作失败"
+      formRef.value.validate(valid=>{
+        if (valid){
+          let data = {}
+          if (categoryForm.id == null){
+            data.categoryName = categoryForm.categoryName
+          }else {
+            data.id = categoryForm.id
+            data.categoryName = categoryForm.categoryName
+          }
+          addOrUpdateCategory(data).then(res=>{
+            if (res.flag){
+              ElMessage({
+                type:"success",
+                message:"操作成功"
+              })
+              addOrEdit.value = !addOrEdit.value
+              getCategories()
+            }else {
+              ElMessage({
+                type:"error",
+                message:"操作失败"
+              })
+            }
           })
         }
       })
@@ -251,7 +258,6 @@ export default {
       categoryList,
       pageInfo,
       selectCategory,
-      getBodyWidth,
       doDeleteCategory,
       doDeleteCategoryBatch,
       openDialog,
@@ -259,6 +265,7 @@ export default {
       addOrEditCategory,
       handleSelectionChange,
       formatDate,
+      formRef,
       handleCurrentChange
     }
   },

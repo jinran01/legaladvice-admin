@@ -93,6 +93,7 @@ import 'echarts-wordcloud'
 import geoCoordMap from '@/utils/city2coord.json'
 
 import {onMounted, reactive, ref, toRefs} from "vue";
+import {formatDate} from "@/common/js/formatDate";
 
 export default {
   name: "Home",
@@ -126,6 +127,11 @@ export default {
     //初始化访问量图表
     const initVisitRecordEcharts = () => {
       visitRecordEcharts = echarts.init(document.getElementById('visitRecordEcharts'))
+      let dateInfo = []
+      for (let i = 6; i >= 0 ; i--) {
+        let date = new Date(Date.now() - (60 * 60 * 24 * i)*1000)
+        dateInfo.push(date.toLocaleDateString().replace(/\//g,'-'))
+      }
       let visitRecordOption = {
         tooltip: {
           trigger: 'axis',
@@ -146,7 +152,7 @@ export default {
         xAxis: {
           type: 'category',
           boundaryGap: false,
-          data: ['2024-4-7', '2024-4-8', '2024-4-9', '2024-4-10', '2024-4-11', '2024-4-12', '2024-4-13  ']
+          data: dateInfo
         },
         yAxis: {
           type: 'value',
@@ -229,7 +235,6 @@ export default {
       ]
       categoryOption.legend.data = legendData
       categoryOption.series[0].data = series
-      console.log(categoryOption)
       categoryEcharts.setOption(categoryOption)
     }
     //初始化文章表格

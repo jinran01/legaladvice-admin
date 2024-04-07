@@ -7,7 +7,7 @@
             <Plus/>
           </el-icon>
         </template>
-        新增分类
+        新增标签
       </el-button>
       <el-button type="danger" :disabled="selectTags.length == 0" @click="doDeleteTagBatch">
         <template #icon>
@@ -18,7 +18,7 @@
         批量删除
       </el-button>
       <div class="search">
-        <el-input v-model="tagName" style="margin-right: 10px">
+        <el-input v-model="tagName" style="margin-right: 10px" @keydown.enter="searchTag">
           <template #prefix>
             <el-icon>
               <Search/>
@@ -41,7 +41,7 @@
         border
         @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center"/>
-      <el-table-column prop="tagName" label="分类名称" align="center" />
+      <el-table-column prop="tagName" label="标签名称" align="center" />
       <el-table-column prop="articleCount" label="文章量" align="center"/>
       <el-table-column prop="createTime" label="创建时间" align="center">
         <template #default="scope">
@@ -89,15 +89,21 @@
     />
   </div>
   <!-- 添加编辑对话框 -->
-  <el-dialog v-model="addOrEdit" :width="getBodyWidth >= 667 ? '30%' : '90%'">
+  <el-dialog v-model="addOrEdit">
     <template #header>
       <div style="font-size: 17px">
-        {{ tagForm.id != null ? '编辑分类' : '新增分类' }}
+        {{ tagForm.id != null ? '编辑标签' : '新增标签' }}
       </div>
     </template>
-    <el-form label-width="80px" size="medium" :model="tagForm">
-      <el-form-item label="分类名">
-        <el-input v-model="tagForm.tagName"  />
+    <el-form label-width="80px" ref="formRef" :model="tagForm" @submit.native.prevent>
+      <el-form-item prop="tagName" label="标签名"  :rules="[
+        {
+          required: true,
+          message: '标签名不能为空',
+          trigger: 'blur',
+        },
+      ]" >
+        <el-input v-model="tagForm.tagName" />
       </el-form-item>
     </el-form>
     <template #footer>
@@ -123,13 +129,13 @@ export default {
     let tagList = ref([])
     let selectTags = ref([])
     let addOrEdit = ref(false)
+    let formRef = ref()
     let pageInfo = {
       size:10,
       current:1,
     }
     let state = reactive({
       count:0,
-      bodyWidth:0
     })
     let tagForm = reactive({
       id:null,
@@ -180,10 +186,6 @@ export default {
         }
       })
     }
-    const getBodyWidth = computed(() => {
-      state.bodyWidth = store.state.bodyWidth
-      return state.bodyWidth
-    })
     //打开对话框
     const openDialog = (data) => {
       tagForm.id = null
@@ -194,27 +196,31 @@ export default {
       }
       addOrEdit.value = !addOrEdit.value
     }
-    //新增或者编辑分类
+    //新增或者编辑标签
     const addOrEditTag = () => {
-      let data = {}
-      if (tagForm.id == null){
-        data.tagName = tagForm.tagName
-      }else {
-        data.id = tagForm.id
-        data.tagName = tagForm.tagName
-      }
-      addOrUpdateTag(data).then(res=>{
-        if (res.flag){
-          ElMessage({
-            type:"success",
-            message:"操作成功"
-          })
-          addOrEdit.value = !addOrEdit.value
-          getTags()
-        }else {
-          ElMessage({
-            type:"error",
-            message:"操作失败"
+      formRef.value.validate(valid=>{
+        if (valid){
+          let data = {}
+          if (tagForm.id == null){
+            data.tagName = tagForm.tagName
+          }else {
+            data.id = tagForm.id
+            data.tagName = tagForm.tagName
+          }
+          addOrUpdateTag(data).then(res=>{
+            if (res.flag){
+              ElMessage({
+                type:"success",
+                message:"操作成功"
+              })
+              addOrEdit.value = !addOrEdit.value
+              getTags()
+            }else {
+              ElMessage({
+                type:"error",
+                message:"操作失败"
+              })
+            }
           })
         }
       })
@@ -224,6 +230,8 @@ export default {
       getTagList(pageInfo).then(res => {
         tagList.value = res.data.recordList
         state.count = res.data.count
+      }).catch(e=>{
+        console.log(e)
       })
     }
     const searchTag = () => {
@@ -251,7 +259,6 @@ export default {
       tagName,
       tagList,
       pageInfo,
-      getBodyWidth,
       tagForm,
       selectTags,
       doDeleteTag,
@@ -261,6 +268,7 @@ export default {
       addOrEditTag,
       handleSelectionChange,
       handleCurrentChange,
+      formRef,
       formatDate
     }
   },
