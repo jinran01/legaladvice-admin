@@ -1,114 +1,115 @@
 <template>
-  <div class="main">
-      <el-row class="panel-group" :gutter="50">
-        <el-col :span="6">
-          <el-card class="card-panel" body-style="padding: 0">
-            <div class="card-panel-icon-wrapper">
-              <img src="@/assets/icons/png/pvCount.png" alt="" style="width: 58px;height: 58px">
-            </div>
-            <div class="card-panel-description">
-              <div class="card-panel-text">访问量</div>
-              <span class="card-panel-num">{{ pv }}</span>
-            </div>
-          </el-card>
-        </el-col>
+  <div class="main" style="width: 100%">
+    <el-row class="panel-group" :gutter="50">
+      <el-col :span="6" :xs="24">
+        <el-card class="card-panel" body-style="padding: 0">
+          <div class="card-panel-icon-wrapper">
+            <img src="@/assets/icons/png/pvCount.png" alt="" style="width: 58px;height: 58px">
+          </div>
+          <div class="card-panel-description">
+            <div class="card-panel-text">访问量</div>
+            <span class="card-panel-num">{{ pv }}</span>
+          </div>
+        </el-card>
+      </el-col>
 
-        <el-col :span="6">
-          <el-card class="card-panel" body-style="padding: 0">
-            <div class="card-panel-icon-wrapper">
-              <img src="@/assets/icons/png/userCount.png" alt="" style="width: 48px;height: 48px">
-            </div>
-            <div class="card-panel-description">
-              <div class="card-panel-text">用户量</div>
-              <span class="card-panel-num">{{ uv }}</span>
-            </div>
-          </el-card>
-        </el-col>
+      <el-col :span="6" :xs="24">
+        <el-card class="card-panel" body-style="padding: 0">
+          <div class="card-panel-icon-wrapper">
+            <img src="@/assets/icons/png/userCount.png" alt="" style="width: 48px;height: 48px">
+          </div>
+          <div class="card-panel-description">
+            <div class="card-panel-text">用户量</div>
+            <span class="card-panel-num">{{ uv }}</span>
+          </div>
+        </el-card>
+      </el-col>
 
-        <el-col :span="6">
-          <el-card class="card-panel" body-style="padding: 0">
-            <div class="card-panel-icon-wrapper">
-              <img src="@/assets/icons/png/articleCount.png" alt="" style="width: 48px;height: 48px">
-            </div>
-            <div class="card-panel-description">
-              <div class="card-panel-text">文章数</div>
-              <span class="card-panel-num">{{ commentCount }}</span>
-            </div>
-          </el-card>
-        </el-col>
+      <el-col :span="6" :xs="24">
+        <el-card class="card-panel" body-style="padding: 0">
+          <div class="card-panel-icon-wrapper">
+            <img src="@/assets/icons/png/articleCount.png" alt="" style="width: 48px;height: 48px">
+          </div>
+          <div class="card-panel-description">
+            <div class="card-panel-text">文章数</div>
+            <span class="card-panel-num">{{ articleCount }}</span>
+          </div>
+        </el-card>
+      </el-col>
 
-        <el-col :span="6">
-          <el-card class="card-panel" body-style="padding: 0">
-            <div class="card-panel-icon-wrapper">
-              <img src="@/assets/icons/png/commentCount.png" alt="" style="width: 48px;height: 48px">
-            </div>
-            <div class="card-panel-description">
-              <div class="card-panel-text">评论数</div>
-              <span class="card-panel-num">{{ commentCount }}</span>
-            </div>
-          </el-card>
-        </el-col>
-      </el-row>
+      <el-col :span="6" :xs="24">
+        <el-card class="card-panel" body-style="padding: 0">
+          <div class="card-panel-icon-wrapper">
+            <img src="@/assets/icons/png/commentCount.png" alt="" style="width: 48px;height: 48px">
+          </div>
+          <div class="card-panel-description">
+            <div class="card-panel-text">留言数</div>
+            <span class="card-panel-num">{{ messageCount }}</span>
+          </div>
+        </el-card>
+      </el-col>
+    </el-row>
+    <el-row class="panel-group">
+      <el-col>
+        <el-card>
+          <div ref="visitRecordEcharts" class="visitRecordEcharts" id="visitRecordEcharts" style="height:500px;width: 100%"></div>
+        </el-card>
+      </el-col>
+    </el-row>
+    <el-row class="panel-group" :gutter="20">
+      <el-col :span="16" :xs="24">
+        <el-card>
+          <div ref="mapEcharts" id="mapEcharts" style="height:500px"></div>
+        </el-card>
+      </el-col>
+      <el-col :span="8" :xs="24">
+        <el-card>
+          <div ref="categoryEcharts" id="categoryEcharts" style="height:500px;"></div>
+        </el-card>
+      </el-col>
+    </el-row>
 
-      <el-row class="panel-group" :gutter="20">
-        <el-col :span="16" :xs="24">
-          <el-card>
-            <div ref="mapEcharts" id="mapEcharts" style="height:500px"></div>
-          </el-card>
-        </el-col>
-        <el-col :span="8" :xs="24">
-          <el-card>
-            <div ref="categoryEcharts" id="categoryEcharts" style="height:500px;"></div>
-          </el-card>
-        </el-col>
-<!--        <el-col :span="8">-->
-<!--          <el-card>-->
-<!--            <div ref="tagEcharts" style="height:500px;"></div>-->
-<!--          </el-card>-->
-<!--        </el-col>-->
-      </el-row>
-
-      <el-row class="panel-group" :gutter="20">
+    <el-row class="panel-group" :gutter="20">
       <el-col :span="8" :xs="24">
         <el-card>
           <div ref="tagEcharts" id="tagEcharts" style="height:500px;"></div>
         </el-card>
       </el-col>
-        <el-col :span="16" :xs="24">
-          <el-card>
-            <div ref="articleEcharts" id="articleEcharts" style="height:500px"></div>
-          </el-card>
-        </el-col>
+      <el-col :span="16" :xs="24">
+        <el-card>
+          <div ref="articleEcharts" id="articleEcharts" style="height:500px"></div>
+        </el-card>
+      </el-col>
     </el-row>
 
-<!--      <el-card class="panel-group">-->
-<!--        <div ref="visitRecordEcharts" style="height:500px;"></div>-->
-<!--      </el-card>-->
-    </div>
+  </div>
 </template>
 
 <script>
 import echarts from 'echarts'
 import 'echarts/map/js/china'
+import 'echarts-wordcloud'
 //城市经纬度数据来自 https://github.com/Naccl/region2coord
-import  geoCoordMap from '@/utils/city2coord.json'
+import geoCoordMap from '@/utils/city2coord.json'
 
 import {onMounted, reactive, ref, toRefs} from "vue";
+
 export default {
   name: "Home",
-  setup(){
+  setup() {
     let stat = reactive({
       pv: 0,
       uv: 0,
-      blogCount: 0,
-      commentCount: 0,
+      articleCount: 0,
+      messageCount: 0,
     })
     let categoryEcharts = ref()
     let tagEcharts = ref()
     let mapEcharts = ref()
     let articleEcharts = ref()
+    let visitRecordEcharts = ref()
     //封装数据
-    const convertData = (data) =>{
+    const convertData = (data) => {
       let res = []
       for (let i = 0; i < data.length; i++) {
         let geoCoord = geoCoordMap[data[i].city]
@@ -121,6 +122,59 @@ export default {
         }
       }
       return res
+    }
+    //初始化访问量图表
+    const initVisitRecordEcharts = () => {
+      visitRecordEcharts = echarts.init(document.getElementById('visitRecordEcharts'))
+      let visitRecordOption = {
+        tooltip: {
+          trigger: 'axis',
+        },
+        color: [
+            '#5470c6','#91cc75','#fac858','#ee6666','#73c0de','#3ba272','#fc8452','#9a60b4','#ea7ccc'
+        ],
+        legend: {
+          data: ["访问量", '用户量', '文章数', '留言数'],
+          // y: 'bottom'
+        },
+        grid: {
+          left: '3%',
+          right: '4%',
+          bottom: '3%',
+          containLabel: true
+        },
+        xAxis: {
+          type: 'category',
+          boundaryGap: false,
+          data: ['2024-4-7', '2024-4-8', '2024-4-9', '2024-4-10', '2024-4-11', '2024-4-12', '2024-4-13  ']
+        },
+        yAxis: {
+          type: 'value',
+        },
+        series: [
+          {
+            name: '访问量',
+            type: 'line',
+            data: [120, 132, 101, 134, 90, 230, 210],
+          },
+          {
+            name: '用户量',
+            type: 'line',
+            data: [150, 160, 170, 180, 190, 200, 210]
+          },
+          {
+            name: '文章数',
+            type: 'line',
+            data: [70, 90, 150, 130, 135, 140, 120]
+          },
+          {
+            name: '留言数',
+            type: 'line',
+            data: [100, 200, 300, 400, 500, 600, 700]
+          },
+        ]
+      }
+      visitRecordEcharts.setOption(visitRecordOption)
     }
     //初始化分类表格
     const initCategory = () => {
@@ -152,27 +206,27 @@ export default {
       //TODO 获取数据
       let legendData = ["学习笔记", "个人项目", "技术杂烩", "心情随写"]
       let series = [
-          {
-            "id": 32,
-            "name": "心情随写",
-            "value": 7
-          },
-          {
-            "id": 33,
-            "name": "技术杂烩",
-            "value": 8
-          },
-          {
-            "id": 34,
-            "name": "个人项目",
-            "value": 5
-          },
-          {
-            "id": 35,
-            "name": "学习笔记",
-            "value": 9
-          },
-        ]
+        {
+          "id": 32,
+          "name": "心情随写",
+          "value": 7
+        },
+        {
+          "id": 33,
+          "name": "技术杂烩",
+          "value": 8
+        },
+        {
+          "id": 34,
+          "name": "个人项目",
+          "value": 5
+        },
+        {
+          "id": 35,
+          "name": "学习笔记",
+          "value": 9
+        },
+      ]
       categoryOption.legend.data = legendData
       categoryOption.series[0].data = series
       console.log(categoryOption)
@@ -186,7 +240,7 @@ export default {
           text: '文章访问量TOP10',
           x: 'center'
         },
-        tooltip:{
+        tooltip: {
           trigger: 'axis',
           axisPointer: {
             type: 'cross'
@@ -211,23 +265,91 @@ export default {
         ]
       }
       articleEcharts.setOption(articleOption)
-
     }
-    // window.onresize = function () {
-    //   articleEcharts.resize();
-    // };
+    window.onresize = function () {
+      articleEcharts.resize();
+      tagEcharts.resize();
+      categoryEcharts.resize();
+      mapEcharts.resize();
+      visitRecordEcharts.resize();
+    };
+
     //初始化文章标签图表
     const initTag = () => {
       tagEcharts = echarts.init(document.getElementById('tagEcharts'))
       let articleOption = {
-
+        tooltip: {
+          show: false,
+        },
+        series: [
+          {
+            type:'wordCloud',
+            shape: 'cardioid',
+            size: ['100%', '100%'],
+            // sizeRange: [20, 52.42],
+            textStyle: {
+              normal: {
+                fontFamily: '微软雅黑',
+                color: function() {
+                  // Random color
+                  return 'rgb(' + [
+                    Math.round(Math.random() * 200),
+                    Math.round(Math.random() * 250),
+                    Math.round(Math.random() * 250)
+                  ].join(',') + ')';
+                }
+              }
+            },
+            data: [
+              { name: '微信', value: 1 },
+              { name: '南方+', value: 1045 },
+              { name: '东莞时间网', value: 834 },
+              { name: '东莞', value: 804 },
+              { name: '新浪微博', value: 532 },
+              { name: '今日头条', value: 493 },
+              { name: '腾讯新闻', value: 479 },
+              { name: '东莞阳光网', value: 387 },
+              { name: '东莞日报', value: 289 },
+              { name: '一点资讯', value: 287 },
+              { name: '东方头条网', value: 233 },
+              { name: '南方都市报', value: 228 },
+              { name: '新粤网', value: 207 },
+              { name: '南方plus', value: 206 },
+              { name: '网易新闻', value: 201 },
+              { name: '东方头条', value: 180 },
+              { name: '趣头条', value: 178 },
+              { name: '羊城派', value: 151 },
+              { name: '东莞时报', value: 143 },
+              { name: '微信', value: 2 },
+              { name: '南方+', value: 3 },
+              { name: '东莞时间网', value: 4 },
+              { name: '东莞', value: 5 },
+              { name: '新浪微博', value: 6 },
+              { name: '今日头条', value: 7 },
+              { name: '腾讯新闻', value: 9 },
+              { name: '东莞阳光网', value: 8 },
+              { name: '东莞日报', value: 10 },
+              { name: '一点资讯', value: 11 },
+              { name: '东方头条网', value: 12 },
+              { name: '南方都市报', value: 13 },
+              { name: '新粤网', value: 14 },
+              { name: '南方plus', value: 15 },
+              { name: '网易新闻', value: 16 },
+              { name: '东方头条', value: 17 },
+              { name: '趣头条', value: 18 },
+              { name: '羊城派', value: 19 },
+              { name: '东莞时报', value: 20 },
+            ]
+          }
+        ]
       }
+      tagEcharts.setOption(articleOption)
     }
 
     //初始化地图表格
-    const  initMap = () => {
+    const initMap = () => {
       mapEcharts = echarts.init(document.getElementById('mapEcharts'))
-      let mapOption =  {
+      let mapOption = {
         title: {
           text: '访客地图',
           x: 'center'
@@ -418,26 +540,30 @@ export default {
         }
       ]
       mapOption.series[1].data = convertData(data)
-      mapOption.series[2].data = convertData(data).splice(0,6)
+      mapOption.series[2].data = convertData(data).splice(0, 6)
       mapEcharts.setOption(mapOption)
     }
 
-    onMounted(()=>{
-      initMap()
-      initCategory()
-      initTag()
-      initArticle()
+    onMounted(() => {
+      setTimeout(()=>{
+        initMap()
+        initCategory()
+        initTag()
+        initArticle()
+        initVisitRecordEcharts()
+      },500)
     })
-    return{
+    return {
       ...toRefs(stat),
     }
   }
 }
 </script>
 <style scoped lang="scss">
-.main{
+.main {
   overflow-x: hidden
 }
+
 .panel-group {
   margin-bottom: 30px;
 }
@@ -474,5 +600,12 @@ export default {
 .panel-group .card-panel .card-panel-description .card-panel-num {
   font-size: 20px;
 }
-
+.visitRecordEcharts{
+  div{
+    width: 100%;
+    canvas{
+      width: 100%;
+    }
+  }
+}
 </style>

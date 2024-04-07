@@ -1,243 +1,286 @@
 <template>
-  <el-card class="main-card">
-<!--    <div class="title">{{ this.$route.name }}</div>-->
-    <!-- 表格操作 -->
-    <div class="operation-container">
-      <el-button
-        type="primary"
-        size="small"
-        icon="el-icon-plus"
-        @click="openModel(null)"
-      >
-        新增
+  <div class="container">
+    <div class="operation">
+      <el-button type="primary" @click="openDialog(null)">
+        <template #icon>
+          <el-icon>
+            <Plus/>
+          </el-icon>
+        </template>
+        新增分类
       </el-button>
-      <el-button
-        type="danger"
-        size="small"
-        icon="el-icon-delete"
-        :disabled="tagIdList.length == 0"
-        @click="isDelete = true"
-      >
+      <el-button type="danger" :disabled="selectTags.length == 0" @click="doDeleteTagBatch">
+        <template #icon>
+          <el-icon>
+            <DeleteFilled/>
+          </el-icon>
+        </template>
         批量删除
       </el-button>
-      <div style="margin-left:auto">
-        <el-input
-          v-model="keywords"
-          prefix-icon="el-icon-search"
-          size="small"
-          placeholder="请输入标签名"
-          style="width:200px"
-          @keyup.enter.native="searchTags"
-        />
-        <el-button
-          type="primary"
-          size="small"
-          icon="el-icon-search"
-          style="margin-left:1rem"
-          @click="searchTags"
-        >
-          搜索
+      <div class="search">
+        <el-input v-model="tagName" style="margin-right: 10px">
+          <template #prefix>
+            <el-icon>
+              <Search/>
+            </el-icon>
+          </template>
+        </el-input>
+        <el-button @click="searchTag">
+          <template #icon>
+            <el-icon>
+              <Search/>
+            </el-icon>
+          </template>
         </el-button>
       </div>
     </div>
-    <!-- 表格展示 -->
+  </div>
+  <div class="tableList">
     <el-table
-      border
-      :data="tagList"
-      v-loading="loading"
-      @selection-change="selectionChange"
-    >
-      <!-- 表格列 -->
-      <el-table-column type="selection" width="55" />
-      <!-- 标签名 -->
-      <el-table-column prop="tagName" label="标签名" align="center">
-        <template slot-scope="scope">
-          <el-tag>
-            {{ scope.row.tagName }}
-          </el-tag>
-        </template>
-      </el-table-column>
-      <!-- 文章量 -->
-      <el-table-column prop="articleCount" label="文章量" align="center" />
-      <!-- 标签创建时间 -->
+        :data="tagList"
+        border
+        @selection-change="handleSelectionChange">
+      <el-table-column type="selection" width="55" align="center"/>
+      <el-table-column prop="tagName" label="分类名称" align="center" />
+      <el-table-column prop="articleCount" label="文章量" align="center"/>
       <el-table-column prop="createTime" label="创建时间" align="center">
-        <template slot-scope="scope">
-          <i class="el-icon-time" style="margin-right:5px" />
-          {{ scope.row.createTime | date }}
+        <template #default="scope">
+          {{formatDate(scope.row.createTime,"YYYY-MM-dd hh:mm:ss")}}
         </template>
       </el-table-column>
-      <!-- 列操作 -->
-      <el-table-column label="操作" align="center" width="160">
-        <template slot-scope="scope">
-          <el-button type="primary" size="mini" @click="openModel(scope.row)">
+      <el-table-column label="操作" align="center">
+        <template #default="scope">
+          <el-button size="small" @click="openDialog(scope.row)">
+            <template #icon>
+              <Edit/>
+            </template>
             编辑
           </el-button>
           <el-popconfirm
-            title="确定删除吗？"
-            style="margin-left:1rem"
-            @confirm="deleteTag(scope.row.id)"
+              confirm-button-text="确定"
+              cancel-button-text="取消"
+              width="220"
+              icon-color="#626AEF"
+              title="确定要删除该标签吗?"
+              @confirm="doDeleteTag(scope.row)"
           >
-            <el-button size="mini" type="danger" slot="reference">
-              删除
-            </el-button>
+            <template #reference>
+              <el-button size="small" type="danger">
+                <template #icon>
+                  <el-icon>
+                    <DeleteFilled/>
+                  </el-icon>
+                </template>
+                删除
+              </el-button>
+            </template>
           </el-popconfirm>
         </template>
       </el-table-column>
+
     </el-table>
-    <!-- 分页 -->
     <el-pagination
-      class="pagination-container"
-      background
-      @size-change="sizeChange"
-      @current-change="currentChange"
-      :current-page="current"
-      :page-size="size"
-      :total="count"
-      :page-sizes="[10, 20]"
-      layout="total, sizes, prev, pager, next, jumper"
+        style="margin-top: 10px;float: right;margin-bottom: 10px"
+        background
+        layout="prev, pager, next"
+        :page-size="pageInfo.size"
+        :total="count"
+        @current-change="handleCurrentChange"
     />
-    <!-- 批量删除对话框 -->
-    <el-dialog :visible.sync="isDelete" width="30%">
-      <div class="dialog-title-container" slot="title">
-        <i class="el-icon-warning" style="color:#ff9900" />提示
+  </div>
+  <!-- 添加编辑对话框 -->
+  <el-dialog v-model="addOrEdit" :width="getBodyWidth >= 667 ? '30%' : '90%'">
+    <template #header>
+      <div style="font-size: 17px">
+        {{ tagForm.id != null ? '编辑分类' : '新增分类' }}
       </div>
-      <div style="font-size:1rem">是否删除选中项？</div>
-      <div slot="footer">
-        <el-button @click="isDelete = false">取 消</el-button>
-        <el-button type="primary" @click="deleteTag(null)">
-          确 定
-        </el-button>
-      </div>
-    </el-dialog>
-    <!-- 编辑对话框 -->
-    <el-dialog :visible.sync="addOrEdit" width="30%">
-      <div class="dialog-title-container" slot="title" ref="tagTitle" />
-      <el-form label-width="80px" size="medium" :model="tagForm">
-        <el-form-item label="标签名">
-          <el-input style="width:220px" v-model="tagForm.tagName" />
-        </el-form-item>
-      </el-form>
-      <div slot="footer">
-        <el-button @click="addOrEdit = false">取 消</el-button>
-        <el-button type="primary" @click="addOrEditTag">
-          确 定
-        </el-button>
-      </div>
-    </el-dialog>
-  </el-card>
+    </template>
+    <el-form label-width="80px" size="medium" :model="tagForm">
+      <el-form-item label="分类名">
+        <el-input v-model="tagForm.tagName"  />
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <el-button @click="addOrEdit = false">取 消</el-button>
+      <el-button type="primary" @click="addOrEditTag">
+        确 定
+      </el-button>
+    </template>
+  </el-dialog>
 </template>
 
 <script>
+import {computed, onMounted, reactive, ref, toRefs} from "vue";
+import {formatDate} from "@/common/js/formatDate";
+import {addOrUpdateTag, deleteTag, getTagList} from "@/network/tag";
+import store from "@/store";
+import {ElMessage, ElMessageBox} from "element-plus";
+
 export default {
-  created() {
-    this.listTags();
-  },
-  data: function() {
-    return {
-      isDelete: false,
-      loading: true,
-      addOrEdit: false,
-      keywords: null,
-      tagList: [],
-      tagIdList: [],
-      tagForm: {
-        id: null,
-        tagName: ""
-      },
-      current: 1,
-      size: 10,
-      count: 0
-    };
-  },
-  methods: {
-    selectionChange(tagList) {
-      this.tagIdList = [];
-      tagList.forEach(item => {
-        this.tagIdList.push(item.id);
-      });
-    },
-    searchTags() {
-      this.current = 1;
-      this.listTags();
-    },
-    sizeChange(size) {
-      this.size = size;
-      this.listTags();
-    },
-    currentChange(current) {
-      this.current = current;
-      this.listTags();
-    },
-    deleteTag(id) {
-      var param = {};
-      if (id == null) {
-        param = { data: this.tagIdList };
-      } else {
-        param = { data: [id] };
-      }
-      this.axios.delete("/api/admin/tags", param).then(({ data }) => {
-        if (data.flag) {
-          this.$notify.success({
-            title: "成功",
-            message: data.message
-          });
-          this.listTags();
-        } else {
-          this.$notify.error({
-            title: "失败",
-            message: data.message
-          });
-        }
-      });
-      this.isDelete = false;
-    },
-    listTags() {
-      this.axios
-        .get("/api/admin/tags", {
-          params: {
-            current: this.current,
-            size: this.size,
-            keywords: this.keywords
+  name: "Tag",
+  setup() {
+    let tagName = ref('')
+    let tagList = ref([])
+    let selectTags = ref([])
+    let addOrEdit = ref(false)
+    let pageInfo = {
+      size:10,
+      current:1,
+    }
+    let state = reactive({
+      count:0,
+      bodyWidth:0
+    })
+    let tagForm = reactive({
+      id:null,
+      tagName:''
+    })
+    //批量删除
+    const doDeleteTagBatch = () => {
+      ElMessageBox.confirm(
+          '确定删除吗?',
+          '提示',
+          {
+            confirmButtonText: '确认',
+            cancelButtonText: '取消',
+            type: 'warning',
+          }
+      ).then(() => {
+        deleteTag(selectTags.value).then(res=>{
+          if (res.flag){
+            ElMessage({
+              type:"success",
+              message:"删除成功"
+            })
+            getTags()
+          }else {
+            ElMessage({
+              type:"error",
+              message:"删除失败"
+            })
           }
         })
-        .then(({ data }) => {
-          this.tagList = data.data.recordList;
-          this.count = data.data.count;
-          this.loading = false;
-        });
-    },
-    openModel(tag) {
-      if (tag != null) {
-        this.tagForm = JSON.parse(JSON.stringify(tag));
-        this.$refs.tagTitle.innerHTML = "修改标签";
-      } else {
-        this.tagForm.id = null;
-        this.tagForm.tagName = "";
-        this.$refs.tagTitle.innerHTML = "添加标签";
-      }
-      this.addOrEdit = true;
-    },
-    addOrEditTag() {
-      if (this.tagForm.tagName.trim() == "") {
-        this.$message.error("标签名不能为空");
-        return false;
-      }
-      this.axios.post("/api/admin/tags", this.tagForm).then(({ data }) => {
-        if (data.flag) {
-          this.$notify.success({
-            title: "成功",
-            message: data.message
-          });
-          this.listTags();
-        } else {
-          this.$notify.error({
-            title: "失败",
-            message: data.message
-          });
+      }).catch(() => {
+      })
+    }
+    //单删
+    const doDeleteTag = (data) => {
+      deleteTag([data.id]).then(res=>{
+        if (res.flag){
+          ElMessage({
+            type:"success",
+            message:"删除成功"
+          })
+          getTags()
+        }else {
+          ElMessage({
+            type:"error",
+            message:"删除失败"
+          })
         }
-      });
-      this.addOrEdit = false;
+      })
+    }
+    const getBodyWidth = computed(() => {
+      state.bodyWidth = store.state.bodyWidth
+      return state.bodyWidth
+    })
+    //打开对话框
+    const openDialog = (data) => {
+      tagForm.id = null
+      tagForm.tagName = ''
+      if (data != null){
+        tagForm.id = data.id
+        tagForm.tagName =data.tagName
+      }
+      addOrEdit.value = !addOrEdit.value
+    }
+    //新增或者编辑分类
+    const addOrEditTag = () => {
+      let data = {}
+      if (tagForm.id == null){
+        data.tagName = tagForm.tagName
+      }else {
+        data.id = tagForm.id
+        data.tagName = tagForm.tagName
+      }
+      addOrUpdateTag(data).then(res=>{
+        if (res.flag){
+          ElMessage({
+            type:"success",
+            message:"操作成功"
+          })
+          addOrEdit.value = !addOrEdit.value
+          getTags()
+        }else {
+          ElMessage({
+            type:"error",
+            message:"操作失败"
+          })
+        }
+      })
+    }
+    //获取标签
+    const getTags = () => {
+      getTagList(pageInfo).then(res => {
+        tagList.value = res.data.recordList
+        state.count = res.data.count
+      })
+    }
+    const searchTag = () => {
+      pageInfo.keywords = tagName.value
+      getTags()
+    }
+    //选择的标签
+    const handleSelectionChange = (data) => {
+      selectTags.value = []
+      data.map(item=>{
+        selectTags.value.push(item.id)
+      })
+    }
+    //当前页改变
+    const handleCurrentChange = (current) => {
+      pageInfo.current = current
+      getTags()
+    }
+    onMounted(()=>{
+      getTags()
+    })
+    return {
+      ...toRefs(state),
+      addOrEdit,
+      tagName,
+      tagList,
+      pageInfo,
+      getBodyWidth,
+      tagForm,
+      selectTags,
+      doDeleteTag,
+      doDeleteTagBatch,
+      searchTag,
+      openDialog,
+      addOrEditTag,
+      handleSelectionChange,
+      handleCurrentChange,
+      formatDate
+    }
+  },
+
+}
+</script>
+
+<style scoped lang="less">
+.container{
+  margin: 10px;
+  .operation{
+    display: flex;
+    margin-bottom: 15px;
+    .search{
+      display: flex;
+      margin-left: auto;
     }
   }
-};
-</script>
+}
+.tableList{
+  margin: 10px;
+}
+</style>
