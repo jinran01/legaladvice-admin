@@ -20,7 +20,7 @@
           </div>
           <div class="card-panel-description">
             <div class="card-panel-text">用户量</div>
-            <span class="card-panel-num">{{ uv }}</span>
+            <span class="card-panel-num">{{ userCount }}</span>
           </div>
         </el-card>
       </el-col>
@@ -52,7 +52,8 @@
     <el-row class="panel-group">
       <el-col>
         <el-card>
-          <div ref="visitRecordEcharts" class="visitRecordEcharts" id="visitRecordEcharts" style="height:500px;width: 100%"></div>
+          <div ref="visitRecordEcharts" class="visitRecordEcharts" id="visitRecordEcharts"
+               style="height:500px;width: 100%"></div>
         </el-card>
       </el-col>
     </el-row>
@@ -94,22 +95,32 @@ import geoCoordMap from '@/utils/city2coord.json'
 
 import {onMounted, reactive, ref, toRefs} from "vue";
 import {formatDate} from "@/common/js/formatDate";
+import {getBlogBackInfo} from "@/network/home";
 
 export default {
   name: "Home",
   setup() {
     let stat = reactive({
       pv: 0,
-      uv: 0,
+      userCount: 0,
       articleCount: 0,
       messageCount: 0,
+      tagList: [],
+      categoryList: [],
+      legendData: [],
+      increateData: {
+        viewWeek:[],
+        articleWeek:[],
+        messageWeek:[],
+        userWeek:[]
+      }
     })
     let categoryEcharts = ref()
     let tagEcharts = ref()
     let mapEcharts = ref()
     let articleEcharts = ref()
     let visitRecordEcharts = ref()
-    //封装数据
+    //封装地图数据
     const convertData = (data) => {
       let res = []
       for (let i = 0; i < data.length; i++) {
@@ -124,20 +135,43 @@ export default {
       }
       return res
     }
+    //封装标签、分类数据
+    const convert = (data, type) => {
+      let res = []
+      if (type == 'tag'){
+        for (let i = 0; i < data.length; i++) {
+          res.push({
+            name: data[i]['tagName'],
+            value: 0,
+          })
+        }
+      }else {
+        for (let i = 0; i < data.length; i++) {
+          if (data[i]['articleCount'] > 0){
+            stat.legendData.push(data[i]['categoryName'])
+            res.push({
+              name: data[i]['categoryName'],
+              value: data[i]['articleCount'],
+            })
+          }
+        }
+      }
+      return res
+    }
     //初始化访问量图表
     const initVisitRecordEcharts = () => {
       visitRecordEcharts = echarts.init(document.getElementById('visitRecordEcharts'))
       let dateInfo = []
-      for (let i = 6; i >= 0 ; i--) {
-        let date = new Date(Date.now() - (60 * 60 * 24 * i)*1000)
-        dateInfo.push(date.toLocaleDateString().replace(/\//g,'-'))
+      for (let i = 6; i >= 0; i--) {
+        let date = new Date(Date.now() - (60 * 60 * 24 * i) * 1000)
+        dateInfo.push(date.toLocaleDateString().replace(/\//g, '-'))
       }
       let visitRecordOption = {
         tooltip: {
           trigger: 'axis',
         },
         color: [
-            '#5470c6','#91cc75','#fac858','#ee6666','#73c0de','#3ba272','#fc8452','#9a60b4','#ea7ccc'
+          '#5470c6', '#91cc75', '#fac858', '#ee6666', '#73c0de', '#3ba272', '#fc8452', '#9a60b4', '#ea7ccc'
         ],
         legend: {
           data: ["访问量", '用户量', '文章数', '留言数'],
@@ -161,22 +195,22 @@ export default {
           {
             name: '访问量',
             type: 'line',
-            data: [120, 132, 101, 134, 90, 230, 210],
+            data: stat.increateData.viewWeek,
           },
           {
             name: '用户量',
             type: 'line',
-            data: [150, 160, 170, 180, 190, 200, 210]
+            data: stat.increateData.userWeek
           },
           {
             name: '文章数',
             type: 'line',
-            data: [70, 90, 150, 130, 135, 140, 120]
+            data: stat.increateData.articleWeek
           },
           {
             name: '留言数',
             type: 'line',
-            data: [100, 200, 300, 400, 500, 600, 700]
+            data: stat.increateData.messageWeek
           },
         ]
       }
@@ -197,7 +231,7 @@ export default {
         legend: {
           left: 'center',
           top: 'bottom',
-          data: []
+          data: stat.legendData
         },
         series: [
           {
@@ -205,36 +239,10 @@ export default {
             type: 'pie',
             radius: [30, 110],
             roseType: 'area',
-            data: []
+            data: stat.categoryList
           }
         ]
       }
-      //TODO 获取数据
-      let legendData = ["学习笔记", "个人项目", "技术杂烩", "心情随写"]
-      let series = [
-        {
-          "id": 32,
-          "name": "心情随写",
-          "value": 7
-        },
-        {
-          "id": 33,
-          "name": "技术杂烩",
-          "value": 8
-        },
-        {
-          "id": 34,
-          "name": "个人项目",
-          "value": 5
-        },
-        {
-          "id": 35,
-          "name": "学习笔记",
-          "value": 9
-        },
-      ]
-      categoryOption.legend.data = legendData
-      categoryOption.series[0].data = series
       categoryEcharts.setOption(categoryOption)
     }
     //初始化文章表格
@@ -271,6 +279,7 @@ export default {
       }
       articleEcharts.setOption(articleOption)
     }
+
     window.onresize = function () {
       articleEcharts.resize();
       tagEcharts.resize();
@@ -288,14 +297,14 @@ export default {
         },
         series: [
           {
-            type:'wordCloud',
+            type: 'wordCloud',
             shape: 'cardioid',
             size: ['100%', '100%'],
             // sizeRange: [20, 52.42],
             textStyle: {
               normal: {
                 fontFamily: '微软雅黑',
-                color: function() {
+                color: function () {
                   // Random color
                   return 'rgb(' + [
                     Math.round(Math.random() * 200),
@@ -305,46 +314,7 @@ export default {
                 }
               }
             },
-            data: [
-              { name: '微信', value: 1 },
-              { name: '南方+', value: 1045 },
-              { name: '东莞时间网', value: 834 },
-              { name: '东莞', value: 804 },
-              { name: '新浪微博', value: 532 },
-              { name: '今日头条', value: 493 },
-              { name: '腾讯新闻', value: 479 },
-              { name: '东莞阳光网', value: 387 },
-              { name: '东莞日报', value: 289 },
-              { name: '一点资讯', value: 287 },
-              { name: '东方头条网', value: 233 },
-              { name: '南方都市报', value: 228 },
-              { name: '新粤网', value: 207 },
-              { name: '南方plus', value: 206 },
-              { name: '网易新闻', value: 201 },
-              { name: '东方头条', value: 180 },
-              { name: '趣头条', value: 178 },
-              { name: '羊城派', value: 151 },
-              { name: '东莞时报', value: 143 },
-              { name: '微信', value: 2 },
-              { name: '南方+', value: 3 },
-              { name: '东莞时间网', value: 4 },
-              { name: '东莞', value: 5 },
-              { name: '新浪微博', value: 6 },
-              { name: '今日头条', value: 7 },
-              { name: '腾讯新闻', value: 9 },
-              { name: '东莞阳光网', value: 8 },
-              { name: '东莞日报', value: 10 },
-              { name: '一点资讯', value: 11 },
-              { name: '东方头条网', value: 12 },
-              { name: '南方都市报', value: 13 },
-              { name: '新粤网', value: 14 },
-              { name: '南方plus', value: 15 },
-              { name: '网易新闻', value: 16 },
-              { name: '东方头条', value: 17 },
-              { name: '趣头条', value: 18 },
-              { name: '羊城派', value: 19 },
-              { name: '东莞时报', value: 20 },
-            ]
+            data: stat.tagList
           }
         ]
       }
@@ -548,15 +518,27 @@ export default {
       mapOption.series[2].data = convertData(data).splice(0, 6)
       mapEcharts.setOption(mapOption)
     }
+    const getHomeInfo = () => {
+      getBlogBackInfo().then(res => {
+        stat.articleCount = res.data.articleCount
+        stat.pv = res.data.viewsCount
+        stat.messageCount = res.data.messageCount
+        stat.userCount = res.data.userCount
+        stat.tagList = convert(res.data.tagDTOList,'tag')
+        stat.categoryList = convert(res.data.categoryDTOList,'category')
+        stat.increateData = res.data.increateDataDTOList
+      })
+    }
 
     onMounted(() => {
-      setTimeout(()=>{
+      getHomeInfo()
+      setTimeout(() => {
         initMap()
         initCategory()
         initTag()
         initArticle()
         initVisitRecordEcharts()
-      },500)
+      }, 500)
     })
     return {
       ...toRefs(stat),
@@ -605,10 +587,12 @@ export default {
 .panel-group .card-panel .card-panel-description .card-panel-num {
   font-size: 20px;
 }
-.visitRecordEcharts{
-  div{
+
+.visitRecordEcharts {
+  div {
     width: 100%;
-    canvas{
+
+    canvas {
       width: 100%;
     }
   }
