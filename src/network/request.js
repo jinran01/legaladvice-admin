@@ -18,10 +18,6 @@ export function request(config) {
     })
     //相应拦截
     instance.interceptors.response.use(res => {
-        // if (res.data.data.count == null){
-        //     return res.data
-        //     // ElMessage.error(res.data)
-        // }
         switch (res.data.code) {
             case 40001:
                 ElMessage.error(res.data.message)
@@ -30,13 +26,9 @@ export function request(config) {
             case 50000:
                 ElMessage.error(res.data.message)
                 break;
-            // case 51000:
-            //   ElMessage.error(res.data.message)
-            //   break;
         }
         return res.data;
     }, error => {
-        console.log(error)
         // return ElMessage.error(error)
         return error
     })

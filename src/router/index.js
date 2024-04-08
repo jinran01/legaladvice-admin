@@ -51,7 +51,6 @@ const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes
 })
-
 router.beforeEach( (to, from, next) => {
   if (to.path == "/login"){
     next()
@@ -63,6 +62,5 @@ router.beforeEach( (to, from, next) => {
     generaMenu()
     next()
   }
-  next()
 })
 export default router

@@ -5,7 +5,8 @@ import store from './store'
 import ElementPlus from 'element-plus'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import 'element-plus/theme-chalk/index.css';
-
+import mavonEditor from 'mavon-editor'
+import 'mavon-editor/dist/css/index.css'
 // import locale from 'element-plus/lib/locale/lang/zh-cn'
 import "./assets/styles/element-variables.scss"
 import "@/assets/icons/css/all.css"
@@ -17,11 +18,12 @@ let is_mobile = navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|A
 if (is_mobile != null){
     state.is_pc = false
 }
+
 const app = createApp(App)
-app.use(ElementPlus,)
+
+app.use(ElementPlus,).use(mavonEditor)
     .use(router).use(store)
     .mount('#app')
-
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
     app.component(key, component)
 }

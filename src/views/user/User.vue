@@ -65,7 +65,7 @@
           />
         </template>
       </el-table-column>
-      <el-table-column prop="ipAddress" label="登录ip" width="140"/>
+      <el-table-column prop="ipAddress"  label="登录ip" width="140"/>
       <el-table-column prop="ipSource" label="登录地址">
       </el-table-column>
       <el-table-column prop="createTime" label="创建时间" width="150">

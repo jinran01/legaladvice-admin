@@ -162,11 +162,18 @@ export default {
   setup() {
     let baseInfoRef = ref()
     let passInfoRef = ref()
+    // let data = {
+    //   key: '',
+    //   policy: '',
+    //   OSSAccessKeyId: '',
+    //   signature: '',
+    // }
+    // let data = {}
     let data = {
-      'key': '',
-      'policy': '',
-      'OSSAccessKeyId': '',
-      'signature': '',
+      key: '',
+      policy: '',
+      OSSAccessKeyId: '',
+      signature: '',
     };
     let base_info = reactive({
       id: '',
@@ -191,12 +198,6 @@ export default {
     let userInfo = reactive({})
 
     //TODO upload data属性未能够绑定 疑似bug
-    getPolicy({path:"avatar/"}).then(res => {
-      data.signature = res.data.signature,
-        data.policy = res.data.policy,
-        data.OSSAccessKeyId = res.data.accessKeyId,
-        data.key = res.data.dir + v4() + "." + "jpg"
-    })
 
     //上传前
     const before_upload = (file) => {
@@ -214,15 +215,16 @@ export default {
         flag = false
       }
       return new Promise((resolve, reject) => {
-        // getPolicy().then(res => {
-        //   data.signature = res.data.signature,
-        //     data.policy = res.data.policy,
-        //     data.OSSAccessKeyId = res.data.accessKeyId,
-        //     data.key = res.data.dir + v4() + "." + "jpg"
-        // })
-          setTimeout(()=>{
-            resolve(file)
-          },1000)
+        getPolicy().then(res => {
+          data.signature = res.data.signature
+          data.policy = res.data.policy
+          data.OSSAccessKeyId = res.data.accessKeyId
+          data.key = res.data.dir + v4() + "." + "jpg"
+        })
+        console.log(data.policy)
+        setTimeout(()=>{
+          resolve(file)
+        },2000)
       })
     }
 
