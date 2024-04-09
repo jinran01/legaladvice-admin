@@ -32,7 +32,7 @@
         </el-tooltip>
       <el-dropdown class="avatar-container right-menu-item hover-effect" trigger="click">
         <div class="avatar-wrapper">
-          <img :src="avatarUrl" class="user-avatar">
+          <img :src="avatarUrl" class="user-avatar" @changeAvatarUrl="changeAvatarUrl">
           <i class="el-icon-caret-bottom"/>
         </div>
         <template #dropdown>
@@ -59,6 +59,12 @@ import store from "@/store";
 export default {
   name: "Navbar",
   components: {Expand},
+  props:{
+    avatarUrl:{
+      type: String,
+      default: state.userInfo.avatar
+    }
+  },
   computed: {
     state() {
       return state
@@ -68,12 +74,10 @@ export default {
     let stat = ref({
       isFold : false,
     })
-    //更新头像
 
-    let avatarUrl = computed(()=>{
-      return store.state.userInfo.avatar
-      // return userInfo.value
-    })
+    //更新头像
+    let avatarUrl =  props.avatarUrl
+
     //是否折叠菜单
     const handleFold = () => {
       stat.value.isFold = !stat.value.isFold

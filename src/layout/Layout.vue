@@ -46,11 +46,11 @@
         </el-scrollbar>
       </div>
       <el-main class="layout-main">
-        <el-container>
+        <el-container >
           <el-header class="el-header">
             <el-container>
               <el-header class="navBar">
-                <navbar @changeIsFold="changeIsFold"/>
+                <navbar @changeIsFold="changeIsFold" :avatarUrl="avatarUrl"/>
               </el-header>
               <el-scrollbar class="tags-view-container">
                 <div class="scrollbar-flex-content">
@@ -71,7 +71,7 @@
             <router-view v-slot="{ Component }" :key="$route.fullPath">
               <keep-alive>
                 <transition name="el-zoom-in-top">
-                  <component :is="Component"/>
+                  <component :is="Component" @changeAvatarUrl="changeAvatarUrl"/>
                 </transition>
               </keep-alive>
             </router-view>
@@ -110,6 +110,7 @@ export default {
       tags_check: 0,
       menuCheck: '/',
     })
+    let avatarUrl = ref()
     // let breadcrumbName = ref('')
     let tags = ref(state.tags)
     let menuList = reactive([])
@@ -127,7 +128,10 @@ export default {
     let changeIsFold = (val) => {
       stat.value.isFold = val
     }
-
+    const changeAvatarUrl = (val) => {
+      avatarUrl.value = val
+      // console.log(avatarUrl.value)
+    }
 
     //关闭tags
     const closeTags = (index) => {
@@ -212,8 +216,10 @@ export default {
       stat,
       tags,
       menuList,
+      avatarUrl,
       // breadcrumbName,
       check_tag,
+      changeAvatarUrl,
       handleCheckMenu,
       changeIsFold,
       closeTags,

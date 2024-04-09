@@ -9,15 +9,15 @@
             </div>
           </template>
           <el-upload
-            action="https://legaladvice.oss-cn-beijing.aliyuncs.com"
-            :data="data"
-            :auto-upload="true"
-            class="avatar-uploader"
-            :show-file-list="false"
-            :before-upload="before_upload"
-            :on-success="handleAvatarSuccess"
+              :action="action"
+              :data="data"
+              :auto-upload="true"
+              class="avatar-uploader"
+              :show-file-list="false"
+              :before-upload="before_upload"
+              :on-success="handleAvatarSuccess"
           >
-            <img :src="base_info.avatarUrl" class="avatar" />
+            <img :src="base_info.avatarUrl" class="avatar"/>
           </el-upload>
           <el-divider/>
           <p class="info_item">
@@ -62,11 +62,11 @@
           <el-tabs v-model="activeName" class="info_tabs" @tabChange="handlerTab">
             <el-tab-pane label="基本资料" name="base_info">
               <el-form
-                ref="baseInfoRef"
-                label-position="right"
-                label-width="auto"
-                :model="base_info"
-                style="max-width: 600px"
+                  ref="baseInfoRef"
+                  label-position="right"
+                  label-width="auto"
+                  :model="base_info"
+                  style="max-width: 600px"
               >
                 <el-form-item prop="nickname" label="用户昵称" :rules="[
                   {
@@ -85,8 +85,8 @@
                 </el-form-item>
                 <el-form-item label="性别">
                   <el-radio-group v-model="base_info.sex" class="ml-4">
-                    <el-radio :value=1 size="default">男</el-radio>
-                    <el-radio :value=2 size="default">女</el-radio>
+                    <el-radio :label='1' size="default">男</el-radio>
+                    <el-radio :label='2' size="default">女</el-radio>
                   </el-radio-group>
                 </el-form-item>
                 <el-form-item label=" ">
@@ -96,11 +96,11 @@
             </el-tab-pane>
             <el-tab-pane label="修改密码" name="change_password">
               <el-form
-                ref="passInfoRef"
-                label-position="right"
-                label-width="auto"
-                :model="passInfo"
-                style="max-width: 600px"
+                  ref="passInfoRef"
+                  label-position="right"
+                  label-width="auto"
+                  :model="passInfo"
+                  style="max-width: 600px"
               >
                 <el-form-item prop="old_password" label="原密码" :rules="[
                   {
@@ -159,9 +159,10 @@ import state from "@/store/state";
 
 export default {
   name: "Setting",
-  setup() {
+  setup(props,context) {
     let baseInfoRef = ref()
     let passInfoRef = ref()
+    let action = ref()
     // let data = {
     //   key: '',
     //   policy: '',
@@ -185,7 +186,7 @@ export default {
       username: '',
       roles: [],
       lastLoginTime: '',
-      avatarUrl:''
+      avatarUrl: ''
     })
     let passInfo = reactive({
       old_password: '',
@@ -201,6 +202,7 @@ export default {
 
     //上传前
     const before_upload = (file) => {
+
       let flag = false
       let types = ["jpg", "png", "jpeg", "JPG", "JPEG", "PNG"]
       let type = file.name.split(".")
@@ -221,10 +223,10 @@ export default {
           data.OSSAccessKeyId = res.data.accessKeyId
           data.key = res.data.dir + v4() + "." + "jpg"
         })
-        console.log(data.policy)
-        setTimeout(()=>{
+        setTimeout(() => {
+          action.value = "https://legaladvice.oss-cn-beijing.aliyuncs.com"
           resolve(file)
-        },2000)
+        }, 3000)
       })
     }
 
@@ -232,42 +234,43 @@ export default {
     const handleAvatarSuccess = () => {
       let url = "https://legaladvice.oss-cn-beijing.aliyuncs.com/"
       base_info.avatarUrl = url + data.key
-      let userInfo = JSON.parse(window.localStorage.getItem("userInfo"))
-      userInfo.avatar = base_info.avatarUrl
-      window.localStorage.setItem("userInfo",JSON.stringify(userInfo))
-      updateUserAvatar({id:base_info.userInfoId,avatar:base_info.avatarUrl}).then(res=>{
-        if (res.flag){
+      updateUserAvatar({id: base_info.userInfoId, avatar: base_info.avatarUrl}).then(res => {
+        if (res.flag) {
+          let userInfo = state.userInfo
+          userInfo.avatar = base_info.avatarUrl
+          window.localStorage.setItem("userInfo", JSON.stringify(userInfo))
+          context.emit('changeAvatarUrl',state.userInfo.avatar)
           ElMessage({
-            message:"修改成功！",
-            type:"success"
+            message: "修改成功！",
+            type: "success"
           })
-        }else {
+        } else {
           ElMessage({
-            message:res.message,
-            type:"error"
+            message: res.message,
+            type: "error"
           })
         }
       })
     }
     //更新密码
     const updatePassword = () => {
-      passInfoRef.value.validate((valid)=>{
+      passInfoRef.value.validate((valid) => {
         if (valid) {
           let info = {
-            id:base_info.id,
-            old_password:passInfo.old_password,
-            new_password:passInfo.new_password,
+            id: base_info.id,
+            old_password: passInfo.old_password,
+            new_password: passInfo.new_password,
           }
-          updatePass(info).then(res=>{
-            if (res.flag){
+          updatePass(info).then(res => {
+            if (res.flag) {
               ElMessage({
                 message: '更新成功!',
                 type: 'success'
               })
-              setTimeout(()=>{
+              setTimeout(() => {
                 router.push("/login")
-              },1000)
-            }else {
+              }, 1000)
+            } else {
               ElMessage({
                 message: res.message,
                 type: 'error'
@@ -278,10 +281,10 @@ export default {
         }
       })
     }
-    const equalPassword = (rule,value,callback) => {
-      if (value != passInfo.new_password){
+    const equalPassword = (rule, value, callback) => {
+      if (value != passInfo.new_password) {
         callback(new Error("两次输入的密码不一致"))
-      }else {
+      } else {
         callback()
       }
     }
@@ -296,6 +299,10 @@ export default {
           }
           updateBaseInfo(info).then(res => {
             if (res.flag) {
+              let userInfo = JSON.parse(window.localStorage.getItem("userInfo"))
+              userInfo.nickname = base_info.nickname
+              userInfo.sex = base_info.sex
+              window.localStorage.setItem("userInfo", JSON.stringify(userInfo))
               ElMessage({
                 message: '更新成功!',
                 type: 'success'
@@ -326,9 +333,9 @@ export default {
           base_info.phone = res.data.phone
           base_info.email = res.data.email
           base_info.roles = res.data.roleList
-          base_info.sex = res.data.sex
+          base_info.sex = state.userInfo.sex
           base_info.lastLoginTime = res.data.lastLoginTime
-          base_info.avatarUrl = JSON.parse(window.localStorage.getItem("userInfo")).avatar
+          base_info.avatarUrl = state.userInfo.avatar
         } else {
           ElMessage({
             message: '出错了！',
@@ -339,6 +346,7 @@ export default {
     })
     return {
       ...toRefs(stat),
+      action,
       userInfo,
       base_info,
       passInfo,
@@ -374,19 +382,23 @@ export default {
     float: right;
   }
 }
-.avatar{
+
+.avatar {
   width: 120px;
   height: 120px;
   border-radius: 120px;
-  border: rgb(0,0,0,0.1) 1px solid;
-  &:hover{
-    box-shadow: 0px 0px 2px 2px rgb(0,0,0,0.1);
+  border: rgb(0, 0, 0, 0.1) 1px solid;
+
+  &:hover {
+    box-shadow: 0px 0px 2px 2px rgb(0, 0, 0, 0.1);
   }
 }
-.avatar-uploader{
+
+.avatar-uploader {
   display: flex;
   justify-content: center;
 }
+
 .el-divider {
   margin: 8px 0px;
 }
