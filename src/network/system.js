@@ -8,10 +8,3 @@ export function getPolicy(data) {
     })
 }
 
-export function uploadImg(data) {
-    return request({
-        url:`https://legaladvice.oss-cn-beijing.aliyuncs.com`,
-        method:"POST",
-        data
-    })
-}

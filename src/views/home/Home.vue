@@ -96,6 +96,7 @@ import geoCoordMap from '@/utils/city2coord.json'
 import {onMounted, reactive, ref, toRefs} from "vue";
 import {formatDate} from "@/common/js/formatDate";
 import {getBlogBackInfo} from "@/network/home";
+import {ElMessage} from "element-plus";
 
 export default {
   name: "Home",
@@ -533,12 +534,17 @@ export default {
     onMounted(() => {
       getHomeInfo()
       setTimeout(() => {
-        initMap()
-        initCategory()
-        initTag()
-        initArticle()
-        initVisitRecordEcharts()
-      }, 500)
+        try {
+          initMap()
+          initCategory()
+          initTag()
+          initArticle()
+          initVisitRecordEcharts()
+        } catch(e)
+        {
+          ElMessage.error("出错了！！！")
+        }
+      }, 700)
     })
     return {
       ...toRefs(stat),

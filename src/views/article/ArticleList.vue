@@ -203,7 +203,7 @@
             <!--文章发表时间-->
             <el-table-column prop="createTime" label="发表时间" align="center" width="120">
               <template #default="scope">
-                {{ formatDate(scope.row.createTime, "YYYY-mm-dd") }}
+                {{ formatDate(scope.row.createTime, "YYYY-MM-dd") }}
               </template>
             </el-table-column>
             <!--文章置顶-->
@@ -313,7 +313,7 @@ export default {
     //文章导出 //TODO
     const isExport = () => {
       ElMessageBox.confirm(
-        '确定删除吗?',
+        '确定导出吗?',
         '提示',
         {
           confirmButtonText: '确认',
@@ -443,7 +443,12 @@ export default {
     }
     //文章置顶
     const updateTop = (data) => {
-      articleIsTop({id: data.id, isTop: data.isTop}).then(res => {
+      let info = {
+        "id": data.id,
+        "isTop": data.isTop
+      }
+      articleIsTop(info).then(res => {
+        console.log(info)
         if (res.flag) {
           ElMessage({
             type: 'success',

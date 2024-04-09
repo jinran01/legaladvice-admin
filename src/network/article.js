@@ -31,7 +31,7 @@ export function addOrUpdateArticle(data){
 //文章置顶
 export function articleIsTop(data){
     return request({
-        url:"/admin/articles",
+        url:"/admin/articles/top",
         method:"PUT",
         data
     })

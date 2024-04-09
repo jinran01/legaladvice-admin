@@ -76,7 +76,8 @@ export default {
     })
 
     //更新头像
-    let avatarUrl =  props.avatarUrl
+    let avatarUrl =  ref()
+    avatarUrl.value = props.avatarUrl
 
     //是否折叠菜单
     const handleFold = () => {
@@ -110,8 +111,6 @@ export default {
         }
       })
     }
-    onMounted(()=>{
-    })
     return{
       stat,
       avatarUrl,

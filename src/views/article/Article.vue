@@ -173,7 +173,7 @@
                      class="upload-cover"
                      drag
                      :show-file-list="false"
-                     action="https://spring-boot-blog-api.oss-cn-hangzhou.aliyuncs.com/"
+                     action="https://legaladvice.oss-cn-beijing.aliyuncs.com/"
                      :auto-upload="true"
                      :data="data"
                      :before-upload="beforeUpload"
@@ -192,7 +192,7 @@
           </el-upload>
           <el-upload v-else
                      :show-file-list="false"
-                     action="https://spring-boot-blog-api.oss-cn-hangzhou.aliyuncs.com/"
+                     action="https://legaladvice.oss-cn-beijing.aliyuncs.com/"
                      :auto-upload="true"
                      :data="data"
                      :before-upload="beforeUpload"
@@ -244,6 +244,7 @@ import {addOrUpdateArticle, getArticleById, uploadArticleCover, uploadPhoto} fro
 import axios from "axios";
 import router from "@/router";
 import {useRoute} from "vue-router";
+import {getPolicy} from "@/network/system";
 
 export default {
   name: "Article",
@@ -350,8 +351,9 @@ export default {
               type: "success",
               message: "发布成功"
             })
-            resetData()
+            // resetData()
             router.push("article-list")
+            resetData()
           } else {
             ElMessage({
               type: "error",
@@ -368,7 +370,7 @@ export default {
               message: "发布成功"
             })
             resetData()
-            router.push("article-list")
+            router.push({path:"article-list"})
           } else {
             ElMessage({
               type: "error",
@@ -378,7 +380,7 @@ export default {
         })
       }
     }
-    //自定义上传图片
+    // 文章内容里自定义上传图片
     const uploadImg = (pos, file) => {
       // let types = ["jpg", "png", "jpeg", "JPG", "JPEG", "PNG"]
       let type = file.name.split(".")
@@ -389,7 +391,7 @@ export default {
           file = res
         })
       }
-      uploadArticleCover().then(res => {
+      getPolicy({path:'markdown'}).then(res => {
         data.signature = res.data.signature
         data.policy = res.data.policy
         data.OSSAccessKeyId = res.data.accessKeyId
@@ -402,7 +404,7 @@ export default {
         fd.append('file', file)
         //上传
         axios({
-          url: 'https://spring-boot-blog-api.oss-cn-hangzhou.aliyuncs.com/',
+          url: 'https://legaladvice.oss-cn-beijing.aliyuncs.com/',
           method: 'POST',
           data: fd,
           processData: false,
@@ -410,7 +412,7 @@ export default {
           contentType: false,
         }).then(res => {
           if (res.status == 204) {
-            url = "https://spring-boot-blog-api.oss-cn-hangzhou.aliyuncs.com/" + data.key
+            url = "https://legaladvice.oss-cn-beijing.aliyuncs.com/" + data.key
             md.value.$img2Url(pos, url)
           }
         })
@@ -434,19 +436,24 @@ export default {
             new_file = res
           })
         }
-        uploadArticleCover().then(res => {
-          data.signature = res.data.signature,
-            data.policy = res.data.policy,
-            data.OSSAccessKeyId = res.data.accessKeyId,
-            data.key = res.data.dir + v4() + "." + type,
-            resolve(new_file)
+        let uuid = v4()
+        getPolicy({path:'articles'}).then(res => {
+          data.signature = res.data.signature
+          data.policy = res.data.policy
+          data.OSSAccessKeyId = res.data.accessKeyId
+          data.key = res.data.dir + uuid + "." + "jpg"
         })
+        setTimeout(() => {
+          // uploadCover(data)
+          resolve(file)
+        }, 3000)
       })
     }
     //上传回调
-    const uploadCover = (data) => {
-      let url = "https://spring-boot-blog-api.oss-cn-hangzhou.aliyuncs.com/"
+    const uploadCover = () => {
+      let url = "https://legaladvice.oss-cn-beijing.aliyuncs.com/"
       article.value.articleCover = url + data.key
+      console.log(article.value.articleCover)
     }
     //搜索标签
     const searchTags = (keywords, callBack) => {
@@ -579,7 +586,7 @@ export default {
         article.value.type = res.data.type
         article.value.originalUrl = res.data.originalUrl
         article.value.categoryName = res.data.categoryName
-        article.value.tagDTOList = res.data.tagDTOList
+        article.value.tagNameList = res.data.tagNameList
         article.value.status = res.data.status
       }).catch(error=>{
         console.log(error)

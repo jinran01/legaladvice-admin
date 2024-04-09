@@ -9,7 +9,7 @@
             </div>
           </template>
           <el-upload
-              :action="action"
+              action="https://legaladvice.oss-cn-beijing.aliyuncs.com"
               :data="data"
               :auto-upload="true"
               class="avatar-uploader"
@@ -152,8 +152,8 @@ import {formatDate} from "@/common/js/formatDate";
 import {getBaseInfo, updateBaseInfo, updatePass} from "@/network/setting";
 import {ElMessage} from "element-plus";
 import router from "@/router";
-import {getPolicy, uploadImg} from "@/network/system";
-import {getAvatarOssToken, updateUserAvatar} from "@/network/user";
+import {getPolicy} from "@/network/system";
+import {updateUserAvatar} from "@/network/user";
 import {v4} from "uuid";
 import state from "@/store/state";
 
@@ -162,14 +162,6 @@ export default {
   setup(props,context) {
     let baseInfoRef = ref()
     let passInfoRef = ref()
-    let action = ref()
-    // let data = {
-    //   key: '',
-    //   policy: '',
-    //   OSSAccessKeyId: '',
-    //   signature: '',
-    // }
-    // let data = {}
     let data = {
       key: '',
       policy: '',
@@ -202,7 +194,6 @@ export default {
 
     //上传前
     const before_upload = (file) => {
-
       let flag = false
       let types = ["jpg", "png", "jpeg", "JPG", "JPEG", "PNG"]
       let type = file.name.split(".")
@@ -217,14 +208,13 @@ export default {
         flag = false
       }
       return new Promise((resolve, reject) => {
-        getPolicy().then(res => {
+        getPolicy({path:'avatar'}).then(res => {
           data.signature = res.data.signature
           data.policy = res.data.policy
           data.OSSAccessKeyId = res.data.accessKeyId
           data.key = res.data.dir + v4() + "." + "jpg"
         })
         setTimeout(() => {
-          action.value = "https://legaladvice.oss-cn-beijing.aliyuncs.com"
           resolve(file)
         }, 3000)
       })
@@ -346,7 +336,6 @@ export default {
     })
     return {
       ...toRefs(stat),
-      action,
       userInfo,
       base_info,
       passInfo,
