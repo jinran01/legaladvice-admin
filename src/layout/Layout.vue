@@ -2,7 +2,6 @@
   <div class="layout">
     <el-container>
       <div class="aside" :style="{width:stat.isFold}">
-<!--      <div class="aside" :style="{width:!state.is_pc && !stat.isFold ? '64px' : '0px',width:state.is_pc?stat.isFold:'64px'}" >-->
           <div class="menu-top">
             Fiee
           </div>
@@ -140,9 +139,7 @@ export default {
         tags.value.splice(index, 1);
         check_tag(next, tags.value[next].path)
       } else {
-        // let next = stat.value.tags_check
         tags.value.splice(index, 1)
-        // check_tag(next,tags.value[next].path)
       }
       window.localStorage.setItem("tags", JSON.stringify(tags.value))
     }
@@ -160,12 +157,11 @@ export default {
           }
           index += 1
         }
-        //没有在tags里面则添加，否则跳转
+        //没有在tags里面就进行添加，否则直接跳转
         if (!flag) {
           tags.value.push({"name": data.name, "path": data.path})
           check_tag(tags.value.length - 1, data.path)
         } else {
-          // let index = tags.value.findIndex()
           check_tag(index, data.path)
         }
       }
@@ -181,6 +177,7 @@ export default {
           }
         })
       }).then(res => {
+        // TODO 去除 修改文章 这个menu
         menuList.push(...res.data)
       }).catch((res) => {
         ElMessage({
@@ -260,7 +257,6 @@ export default {
 }
 
 .tags-view-container {
-  //height: 30px;
   margin-top: 3px;
   border-bottom: 1px solid #d8dce5;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, .12), 0 0 3px 0 rgba(0, 0, 0, .04);
@@ -301,6 +297,7 @@ export default {
   color: #000000;
   border: 1px solid #d8dce5;
 }
+
 .el-sub-menu{
   .el-sub-menu__icon-arrow{
     display: none;

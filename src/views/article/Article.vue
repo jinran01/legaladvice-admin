@@ -240,7 +240,7 @@ import {ElMessage, ElNotification} from "element-plus";
 import {getTags} from "@/network/tag";
 import * as imageConversion from "image-conversion";
 import {v4} from "uuid";
-import {addOrUpdateArticle, getArticleById, uploadArticleCover, uploadPhoto} from "@/network/article";
+import {addOrUpdateArticle, getArticleById} from "@/network/article";
 import axios from "axios";
 import router from "@/router";
 import {useRoute} from "vue-router";
@@ -352,7 +352,7 @@ export default {
               message: "发布成功"
             })
             // resetData()
-            router.push("article-list")
+            router.push("/article-list")
             resetData()
           } else {
             ElMessage({
@@ -420,15 +420,10 @@ export default {
     }
     //上传前
     const beforeUpload = (file) => {
-      let flag = false
-      let types = ["jpg", "png", "jpeg", "JPG", "JPEG", "PNG"]
+      // let types = ["jpg", "png", "jpeg", "JPG", "JPEG", "PNG"]
       let type = file.name.split(".")
       type = type[type.length - 1]
-      if (types.indexOf(type) >= 0) {
-        flag = true
-      } else {
-        flag = false
-      }
+
       return new Promise((resolve, reject) => {
         let new_file
         if (file.size / 1024 > 200) {
@@ -441,7 +436,7 @@ export default {
           data.signature = res.data.signature
           data.policy = res.data.policy
           data.OSSAccessKeyId = res.data.accessKeyId
-          data.key = res.data.dir + uuid + "." + "jpg"
+          data.key = res.data.dir + uuid + "." + type
         })
         setTimeout(() => {
           // uploadCover(data)

@@ -161,7 +161,7 @@ export default {
           }else {
             ElMessage({
               type:"error",
-              message:"删除失败"
+              message: res.message
             })
           }
         })
@@ -180,7 +180,7 @@ export default {
         }else {
           ElMessage({
             type:"error",
-            message:"删除失败"
+            message: res.message
           })
         }
       })

@@ -13,12 +13,6 @@ export function getArticleById(id){
         url:`/admin/articles/${id}`,
     })
 }
-//上传文章封面token
-export function uploadArticleCover(){
-    return request({
-        url:"/admin/articles/cover"
-    })
-}
 
 //保存或更新文章
 export function addOrUpdateArticle(data){

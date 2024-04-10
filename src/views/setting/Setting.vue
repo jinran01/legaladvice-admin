@@ -194,29 +194,23 @@ export default {
 
     //上传前
     const before_upload = (file) => {
-      let flag = false
-      let types = ["jpg", "png", "jpeg", "JPG", "JPEG", "PNG"]
+      // let types = ["jpg", "png", "jpeg", "JPG", "JPEG", "PNG"]
       let type = file.name.split(".")
       type = type[type.length - 1]
       if (file.size > 10 * 1024 * 1024) {
         ElMessage.error('最大支持 10MB 文件')
         return Promise.reject('最大支持 10MB 文件')
       }
-      if (types.indexOf(type) >= 0) {
-        flag = true
-      } else {
-        flag = false
-      }
       return new Promise((resolve, reject) => {
         getPolicy({path:'avatar'}).then(res => {
           data.signature = res.data.signature
           data.policy = res.data.policy
           data.OSSAccessKeyId = res.data.accessKeyId
-          data.key = res.data.dir + v4() + "." + "jpg"
+          data.key = res.data.dir + v4() + "." + type
         })
         setTimeout(() => {
           resolve(file)
-        }, 3000)
+        }, 2000)
       })
     }
 

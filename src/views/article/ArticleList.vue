@@ -255,6 +255,14 @@
             </el-table-column>
           </el-table>
         </div>
+        <el-pagination
+            class="pagination"
+            background
+            layout="prev,pager,next"
+            :page-size=pageInfo.size
+            :total="pageInfo.count"
+            @current-change="pageChange"
+        />
       </el-tab-pane>
     </el-tabs>
   </div>
@@ -325,6 +333,7 @@ export default {
       }).catch(() => {
       })
     }
+
     //批量删除
     const updateIsDelete = () => {
       ElMessageBox.confirm(
@@ -471,6 +480,10 @@ export default {
       })
       articleIdList.value = obj
     }
+    const pageChange = (current) => {
+      pageInfo.current = current
+      getArticleList();
+    }
     onMounted(() => {
       getArticleList()
       getCategoryList()
@@ -505,6 +518,7 @@ export default {
       data.isDelete = state.isDelete
       getArticles(data).then(res => {
         articleList.value = res.data.recordList
+        pageInfo.count = res.data.count
       })
     }
     //搜索文章
@@ -550,6 +564,7 @@ export default {
     }
     return {
       ...toRefs(state),
+      pageChange,
       activeName,
       tab_pane,
       articleIdList,
@@ -588,5 +603,9 @@ export default {
 
 .articleList {
   margin-top: 10px;
+  margin-bottom: 15px;
+}
+.pagination{
+  float: right;
 }
 </style>
