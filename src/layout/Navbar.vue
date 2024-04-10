@@ -37,7 +37,7 @@
         </div>
         <template #dropdown>
           <el-dropdown-menu>
-            <el-dropdown-item>个人中心</el-dropdown-item>
+            <el-dropdown-item @click="goToSetting">个人中心</el-dropdown-item>
             <el-dropdown-item>布局设置</el-dropdown-item>
             <el-dropdown-item divided @click="logoutHandle">退出登录</el-dropdown-item>
           </el-dropdown-menu>
@@ -56,8 +56,15 @@ import screenFull from "screenfull"
 import {Expand} from "@element-plus/icons-vue";
 import state from "@/store/state";
 import store from "@/store";
+import {routes} from "vue-router/auto-routes";
+import {useRouter} from "vue-router";
 export default {
   name: "Navbar",
+  methods: {
+    router() {
+      return router
+    }
+  },
   components: {Expand},
   props:{
     avatarUrl:{
@@ -74,7 +81,10 @@ export default {
     let stat = ref({
       isFold : false,
     })
-
+    const goToSetting = () => {
+      // window.location.href = "/setting";
+      router.push("/setting")
+    }
     //更新头像
     let avatarUrl =  ref()
     avatarUrl.value = props.avatarUrl
@@ -115,6 +125,7 @@ export default {
       stat,
       avatarUrl,
       // breadcrumb,
+      goToSetting,
       SetFullScreen,
       handleFold,
       logoutHandle,
