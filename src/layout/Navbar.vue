@@ -86,9 +86,9 @@ export default {
       router.push("/setting")
     }
     //更新头像
-    let avatarUrl =  ref()
-    avatarUrl.value = props.avatarUrl
-
+    const avatarUrl = computed(()=>{
+      return store.getters.getAvatarUrl
+    })
     //是否折叠菜单
     const handleFold = () => {
       stat.value.isFold = !stat.value.isFold
