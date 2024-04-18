@@ -153,8 +153,8 @@
           </el-form-item>
           <el-form-item label="评论审核">
             <el-radio-group v-model="webInfoConfig.isCommentReview">
-              <el-radio :label=1 size="large">开启</el-radio>
-              <el-radio :label=0 size="large">关闭</el-radio>
+              <el-radio :label=0 size="large">开启</el-radio>
+              <el-radio :label=1 size="large">关闭</el-radio>
             </el-radio-group>
           </el-form-item>
           <el-form-item label="留言审核">

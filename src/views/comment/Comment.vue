@@ -125,8 +125,8 @@
             <!-- 状态 -->
             <el-table-column prop="isReview" label="状态" width="80" align="center">
               <template #default="scope">
-                <el-tag v-if="scope.row.isReview == 1" type="warning">审核中</el-tag>
-                <el-tag v-if="scope.row.isReview == 0" type="success">正常</el-tag>
+                <el-tag v-if="scope.row.isReview == 0" type="warning">审核中</el-tag>
+                <el-tag v-if="scope.row.isReview == 1" type="success">正常</el-tag>
               </template>
             </el-table-column>
             <!-- 来源 -->
@@ -140,7 +140,7 @@
             <!--操作-->
             <el-table-column label="操作" align="center" width="165">
               <template #default="scope">
-                <el-button size="small" type="success" @click="reviewComment(scope.row)" v-if="scope.row.isReview == 1">
+                <el-button size="small" type="success" @click="reviewComment(scope.row)" v-if="scope.row.isReview == 0">
                   <template #icon>
                     <el-icon>
                       <Help/>
@@ -296,7 +296,7 @@ export default {
     //通过评论
     const reviewComment = (data) => {
       let obj = []
-      obj.push({id:data.id,isReview:0})
+      obj.push({id:data.id,isReview:1})
       reviewComments(obj).then(res=>{
         if (res.flag){
           ElMessage({
@@ -324,9 +324,9 @@ export default {
       if (pane.paneName == '1'){
         pageInfo.isReview = ''
       }else if(pane.paneName == '2'){
-        pageInfo.isReview = '0'
-      }else {
         pageInfo.isReview = '1'
+      }else {
+        pageInfo.isReview = '0'
       }
       getComment()
     }
