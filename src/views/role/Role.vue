@@ -204,7 +204,8 @@ export default {
   name: "Role",
   setup() {
     let ids_menu = [2, 3, 4, 19, 202, 205, 213, 215] //根menu的Id
-    let ids_resource = [165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180]
+    //根资源id
+    let ids_resource = [165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 293]
     let roleList = ref([])  //获取角色列表
     let selectRoles = reactive([]) //选择的角色
     let resourceList = ref([])  //获取的菜单或资源列表
