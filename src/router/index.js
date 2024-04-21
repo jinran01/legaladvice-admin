@@ -55,7 +55,7 @@ router.beforeEach((to, from, next) => {
   if (to.path == "/login") {
     next()
   } else {
-    if (state.menuList.length == 0) {
+    if (state.menuList.length == 0 || localStorage.getItem("userInfo")==null) {
       router.push("/login")
       generaMenu()
     }

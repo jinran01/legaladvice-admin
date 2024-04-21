@@ -69,7 +69,7 @@ export default {
   props:{
     avatarUrl:{
       type: String,
-      default: state.userInfo.avatar
+      default: ""
     }
   },
   computed: {
