@@ -109,9 +109,10 @@ export default {
         if (res.flag){
           ElMessage({
             showClose: true,
-            message: '操作成功',
+            message: res.data,
             type: 'success',
           })
+          getUsers()
         }else {
           ElMessage({
             showClose: true,

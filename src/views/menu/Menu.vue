@@ -229,7 +229,7 @@ export default {
       if (state.flag_menu==0){
         //新增
         let data = {}
-        data.parentId = 0
+        // data.parentId = 0
         data.path = form.path
         data.name = form.name
         data.orderNum = form.orderNum
@@ -267,18 +267,9 @@ export default {
     }
     //查询菜单
     const searchMenu = () => {
-      // getMenus();
       getMenuList(menuName.value).then(res=>{
         if (res.flag){
           menuList.value = res.data
-          // menuList.value.map(item=>{
-          //   item.isHidden = item.isHidden == 0 ? false : true
-          //   if (item.children.length > 0){
-          //     item.children.map(i=>{
-          //       i.isHidden = i.isHidden == 0 ? false : true
-          //     })
-          //   }
-          // })
           resetValue(menuList.value)
         }
       })
