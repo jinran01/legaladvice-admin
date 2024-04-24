@@ -209,7 +209,6 @@ export default {
           data.key = res.data.dir + v4() + "." + type
         })
         setTimeout(() => {
-          console.log(data)
           resolve(file)
         }, 2000)
       })

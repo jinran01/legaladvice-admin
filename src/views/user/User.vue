@@ -166,6 +166,7 @@ export default {
     let nickname = ref('')
     let userList = ref([]);
     let userInfo = reactive({
+      userAuthId: 0,
       userId: 0,
       username: '',
       nickname: '',
@@ -232,6 +233,7 @@ export default {
     const doFormVisible = (data) => {
       userInfo.roleList = []
       userInfo.userInfoId = data.userInfoId
+      userInfo.userAuthId = data.id
       userInfo.userId = data.id
       userInfo.username = data.username
       userInfo.nickname = data.nickname

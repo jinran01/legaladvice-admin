@@ -65,3 +65,22 @@ export function updateUserInfo(data) {
         data
     })
 }
+
+//后端获取认证列表
+export function getLawyerAuth(data) {
+    return request({
+        url:"/admin/lawyer",
+        params:data
+    })
+}
+
+
+
+//后端更新审核状态
+export function updateStatusLawyer(data) {
+    return request({
+        url:"/admin/lawyer/status",
+        method: "POST",
+        data
+    })
+}
