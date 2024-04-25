@@ -55,10 +55,10 @@
       </el-table-column>
       <el-table-column prop="lastLoginTime" label="审核时间" width="150">
         <template #default="scope">
-          <el-icon>
+          <el-icon v-if="scope.row.updateTime != null">
             <timer/>
           </el-icon>
-          {{ formatDate(scope.row.updateTime, "YYYY-MM-dd") }}
+          {{scope.row.updateTime != null? formatDate(scope.row.updateTime, "YYYY-MM-dd") :""}}
         </template>
       </el-table-column>
       <el-table-column label="操作" fixed="right" width="160">
