@@ -9,7 +9,7 @@
             </div>
           </template>
           <el-upload
-              action="https://legaladvice.oss-cn-beijing.aliyuncs.com"
+              action="https://legaladvice.oss-cn-beijing.aliyuncs.com/"
               :data="data"
               :auto-upload="true"
               class="avatar-uploader"

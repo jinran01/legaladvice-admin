@@ -16,6 +16,16 @@
 
     </el-breadcrumb>
     <div class="right-menu">
+      <el-tooltip :content="stat.isDark?'日常模式':'暗夜模式'" effect="dark" placement="bottom">
+        <div class="icon-container">
+          <el-icon v-if="stat.isDark" @click="changeDark">
+            <Sunny />
+          </el-icon>
+          <el-icon v-else @click="changeDark">
+            <Moon />
+          </el-icon>
+        </div>
+      </el-tooltip>
         <el-tooltip content="全站搜索" effect="dark" placement="bottom">
           <div class="icon-container">
             <el-icon v-if="state.is_pc">
@@ -56,8 +66,7 @@ import screenFull from "screenfull"
 import {Expand} from "@element-plus/icons-vue";
 import state from "@/store/state";
 import store from "@/store";
-import {routes} from "vue-router/auto-routes";
-import {useRouter} from "vue-router";
+import { useDark, useToggle } from '@vueuse/core'
 export default {
   name: "Navbar",
   methods: {
@@ -79,6 +88,7 @@ export default {
   },
   setup(props, context){
     let stat = ref({
+      isDark: false,
       isFold : false,
     })
     const goToSetting = () => {
@@ -104,6 +114,12 @@ export default {
       //screenfull.toggle 此方法是执行全屏化操作。如果已是全屏状态，则退出全屏
       screenFull.toggle()
     }
+    //改变暗夜模式
+    const changeDark = () => {
+      stat.value.isDark = !stat.value.isDark
+      let html = document.documentElement
+      html.className = stat.value.isDark ? 'dark' : ''
+    }
     // 登出操作
     const logoutHandle = () => {
       logout().then(res=>{
@@ -124,6 +140,7 @@ export default {
     return{
       stat,
       avatarUrl,
+      changeDark,
       // breadcrumb,
       goToSetting,
       SetFullScreen,
@@ -142,7 +159,7 @@ export default {
   height: 50px;
   overflow: hidden;
   position: relative;
-  background: #fff;
+  //background: #fff;
   box-shadow: 0 1px 4px rgba(0, 21, 41, .08);
 
   .icon-container{

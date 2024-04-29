@@ -301,7 +301,6 @@ export default {
             type: 'wordCloud',
             shape: 'cardioid',
             size: ['100%', '100%'],
-            // sizeRange: [20, 52.42],
             textStyle: {
               normal: {
                 fontFamily: '微软雅黑',
