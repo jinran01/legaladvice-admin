@@ -54,3 +54,9 @@ export function uploadPhoto(data){
         data
     })
 }
+//文章top10
+export function getArticleTop() {
+    return request({
+        url:`/articles/top`,
+    })
+}

@@ -84,3 +84,10 @@ export function updateStatusLawyer(data) {
         data
     })
 }
+
+//获取游客地域访问量
+export function userArea() {
+    return request({
+        url:'/admin/users/area',
+    })
+}

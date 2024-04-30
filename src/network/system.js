@@ -7,4 +7,3 @@ export function getPolicy(data) {
         params: data
     })
 }
-

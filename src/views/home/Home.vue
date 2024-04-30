@@ -97,6 +97,8 @@ import {onMounted, reactive, ref, toRefs} from "vue";
 import {formatDate} from "@/common/js/formatDate";
 import {getBlogBackInfo} from "@/network/home";
 import {ElMessage} from "element-plus";
+import {getArticleTop} from "@/network/article";
+import {userArea} from "@/network/user";
 
 export default {
   name: "Home",
@@ -114,13 +116,29 @@ export default {
         articleWeek:[],
         messageWeek:[],
         userWeek:[]
-      }
+      },
+      articleTitle:[],
+      articleViewCount:[],
+      userAreaList:[]
     })
     let categoryEcharts = ref()
     let tagEcharts = ref()
     let mapEcharts = ref()
     let articleEcharts = ref()
     let visitRecordEcharts = ref()
+
+    //文章访问量top10
+    const getArticleTopList = async () => {
+      await getArticleTop().then(res => {
+        if (res.flag) {
+          for (let i = 0; i < res.data.length; i++) {
+            stat.articleTitle.push(res.data[i].articleTitle)
+            stat.articleViewCount.push(res.data[i].viewCount)
+          }
+        }
+      })
+    }
+
     //封装地图数据
     const convertData = (data) => {
       let res = []
@@ -262,7 +280,7 @@ export default {
         },
         xAxis: {
           type: 'category',
-          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+          data: stat.articleTitle,
           axisTick: {
             alignWithLabel: true
           }
@@ -273,7 +291,7 @@ export default {
         },
         series: [
           {
-            data: [120, 200, 150, 80, 70, 110, 130],
+            data: stat.articleViewCount,
             type: 'bar',
           },
         ]
@@ -471,51 +489,8 @@ export default {
           }
         ]
       }
-      //TODO 获取数据
-      let data = [
-        {
-          "city": "上海市",
-          "uv": 3930
-        },
-        {
-          "city": "杭州市",
-          "uv": 2925
-        },
-        {
-          "city": "北京市",
-          "uv": 2808
-        },
-        {
-          "city": "广州市",
-          "uv": 2696
-        },
-        {
-          "city": "成都市",
-          "uv": 1784
-        },
-        {
-          "city": "深圳市",
-          "uv": 1761
-        },
-        {
-          "city": "郑州市",
-          "uv": 1640
-        },
-        {
-          "city": "武汉市",
-          "uv": 1490
-        },
-        {
-          "city": "南京市",
-          "uv": 1476
-        },
-        {
-          "city": "重庆市",
-          "uv": 1002
-        }
-      ]
-      mapOption.series[1].data = convertData(data)
-      mapOption.series[2].data = convertData(data).splice(0, 6)
+      mapOption.series[1].data = convertData(stat.userAreaList)
+      mapOption.series[2].data = convertData(stat.userAreaList).splice(0, 6)
       mapEcharts.setOption(mapOption)
     }
     const getHomeInfo = () => {
@@ -529,9 +504,15 @@ export default {
         stat.increateData = res.data.increateDataDTOList
       })
     }
-
+    const getUserArea = () => {
+      userArea().then(res=>{
+        stat.userAreaList = res.data
+      })
+    }
     onMounted(() => {
       getHomeInfo()
+      getArticleTopList()
+      getUserArea()
       setTimeout(() => {
         try {
           initMap()
