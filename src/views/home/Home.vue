@@ -82,7 +82,6 @@
         </el-card>
       </el-col>
     </el-row>
-
   </div>
 </template>
 
@@ -94,7 +93,6 @@ import 'echarts-wordcloud'
 import geoCoordMap from '@/utils/city2coord.json'
 
 import {onMounted, reactive, ref, toRefs} from "vue";
-import {formatDate} from "@/common/js/formatDate";
 import {getBlogBackInfo} from "@/network/home";
 import {ElMessage} from "element-plus";
 import {getArticleTop} from "@/network/article";
@@ -126,7 +124,6 @@ export default {
     let mapEcharts = ref()
     let articleEcharts = ref()
     let visitRecordEcharts = ref()
-
     //文章访问量top10
     const getArticleTopList = async () => {
       await getArticleTop().then(res => {
@@ -181,7 +178,7 @@ export default {
     const initVisitRecordEcharts = () => {
       visitRecordEcharts = echarts.init(document.getElementById('visitRecordEcharts'))
       let dateInfo = []
-      for (let i = 6; i >= 0; i--) {
+      for (let i = 7; i > 0; i--) {
         let date = new Date(Date.now() - (60 * 60 * 24 * i) * 1000)
         dateInfo.push(date.toLocaleDateString().replace(/\//g, '-'))
       }
@@ -276,6 +273,11 @@ export default {
           trigger: 'axis',
           axisPointer: {
             type: 'cross'
+          },
+          formatter: function (val){
+            for (let i = 0; i < val.length; i++) {
+              return val[i].name + "<br>"+ "访问量:" +val[i].value
+            }
           }
         },
         xAxis: {
@@ -283,7 +285,7 @@ export default {
           data: stat.articleTitle,
           axisTick: {
             alignWithLabel: true
-          }
+          },
         },
         yAxis: {
           name: '访问量/次',
@@ -577,7 +579,6 @@ export default {
 .visitRecordEcharts {
   div {
     width: 100%;
-
     canvas {
       width: 100%;
     }
