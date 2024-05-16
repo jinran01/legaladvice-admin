@@ -170,6 +170,13 @@
               </template>
             </el-table-column>
           </el-table>
+          <el-pagination
+              background
+              layout="prev,pager,next"
+              :page-size=pageInfo.size
+              :total="count"
+              @current-change="pageChange"
+          />
         </div>
       </el-tab-pane>
     </el-tabs>
@@ -189,6 +196,7 @@ export default {
     let commentList = ref([]) //评论列表
     let selectCommentIds = ref([]) //选择的评论id
     let loading = ref(false)
+    let count = ref(0)
     let pageInfo = {
       current:1,
       size:10
@@ -215,6 +223,11 @@ export default {
     let state = reactive({
       keywords:''
     })
+    //换页
+    const pageChange = (current) => {
+      pageInfo.current = current
+      getComment();
+    }
     //多删评论
     const deleteCommentBatch = () => {
       ElMessageBox.confirm(
@@ -340,6 +353,7 @@ export default {
       pageInfo.type = type.value
       getCommentList(pageInfo).then(res=>{
         commentList.value = res.data.recordList
+        count.value = res.data.count
       })
     }
     onMounted(()=>{
@@ -355,10 +369,13 @@ export default {
       reviewComment,
       deleteCommentBatch,
       reviewCommentBatch,
+      pageChange,
       commentList,
       selectCommentIds,
       loading,
       type,
+      pageInfo,
+      count,
       activeName,
       typeList,
       tab_pane,
@@ -379,5 +396,9 @@ export default {
 
 .commentList {
   margin-top: 10px;
+}
+.el-pagination {
+  float: right;
+  padding: 10px;
 }
 </style>

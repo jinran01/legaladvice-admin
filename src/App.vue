@@ -8,6 +8,11 @@
 }
 </style>
 <script setup>
+import {onMounted} from "vue";
+
+onMounted(()=>{
+  document.title = "法律咨询与援助后台管理系统"
+})
 const debounce = (fn, delay) => {
 
   let timer = null;

@@ -1,7 +1,7 @@
 <template>
   <div class="login">
     <el-form ref="loginFormRef" :model="form" class="login-form">
-      <h3 class="title">台管理系统</h3>
+      <h3 class="title">后台管理系统</h3>
       <el-form-item prop="username" :rules="[
         {
           required: true,
