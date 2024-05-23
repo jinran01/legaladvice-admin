@@ -275,6 +275,8 @@ import {formatDate} from "@/common/js/formatDate";
 import {getCategories} from "@/network/category";
 import {getTags} from "@/network/tag";
 import {useRouter} from "vue-router";
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 import {ElMessage, ElMessageBox} from "element-plus";
 
 export default {
@@ -329,7 +331,21 @@ export default {
           type: 'warning',
         }
       ).then(() => {
-
+        const data = ref([
+          { name: 'Alice', email: 'alice@example.com' },
+          { name: 'Bob', email: 'bob@example.com' }
+        ]);
+        const ws = XLSX.utils.json_to_sheet(data.value);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+        const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+        function s2ab(s) {
+          const buf = new ArrayBuffer(s.length);
+          const view = new Uint8Array(buf);
+          for (let i = 0; i !== s.length; ++i) view[i] = s.charCodeAt(i) & 0xFF;
+          return buf;
+        }
+        saveAs(new Blob([s2ab(wbout)], { type: 'application/octet-stream' }), 'data.xlsx');
       }).catch(() => {
       })
     }
@@ -457,7 +473,6 @@ export default {
         "isTop": data.isTop
       }
       articleIsTop(info).then(res => {
-        console.log(info)
         if (res.flag) {
           ElMessage({
             type: 'success',
